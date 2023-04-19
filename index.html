@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat App</title>
+    <style>
+    
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+
+      body {
+        background-color: #f2f2f2;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 800px;
+        margin: 50px auto;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+      }
+
+
+      .header {
+        background-color: #4CAF50;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 36px;
+        font-weight: bold;
+      }
+
+     
+      .messages {
+        list-style-type: none;
+        padding: 20px;
+        height: 400px;
+        overflow-y: scroll;
+      }
+      
+
+      .messages li {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        max-width: 80%;
+      }
+
+      
+      .messages li.sender {
+        background-color: #4CAF50;
+        color: white;
+        margin-left: auto;
+        text-align: right;
+      }
+
+      
+      .messages li.user {
+        background-color: #f1f1f1;
+        color: #333;
+        margin-right: auto;
+        text-align: left;
+      }
+
+
+      .input {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 100%;
+        padding: 20px;
+        background-color: white;
+      }
+
+      .input input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        margin-right: 10px;
+        font-size: 16px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      }
+
+      .input button {
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        width: 100px;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      }
+
+      .input button:hover {
+        background-color: #3e8e41;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Chat App</h1>
+      </div>
+      <ul id="messages" class="messages"></ul>
+      <div class="input">
+        <form id="message-form">
+          <input id="message-input" type="text" placeholder="Type your message here" />
+          <button id="send-button">Send</button>
+        </form>
+      </div>
+    </div>
+
+   
+    <script src="/socket.io/socket.io.js"></script>
+  
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(function () {
+        const socket = io();
+        const username = prompt("Please enter your name");
+        $('form').submit(function (e) {
+          e.preventDefault();
+          const message = $('#message-input').val();
+          socket.emit('chat message', { username, message });
+          $('#message-input').val('');
+          return false;
+        });
+        socket.on('chat message', function (data) {
+          const { username, message } = data;
+          const sender = $('<span>').text(username + ': ');
+          const content = $('<span>').text(message);
+          const li = $('<li>').addClass('message');
+          if (username === '') {
+            li.addClass('anonymous');
+          } else {
+            li.append(sender);
+          }
+          li.append(content);
+          $('#messages').append(li);
+        });
+      });
+    </script>
+  </body>
+</html>
